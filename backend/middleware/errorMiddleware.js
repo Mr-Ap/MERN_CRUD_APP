@@ -1,3 +1,5 @@
+//Written a custom midllerware that will handles errors if there are any and overide the message
+
 const errorHandler = (err, req, res, next) => {
 	const statusCode = res.statusCode === '400' ? res.statusCode : 500;
 
