@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaUser } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { register, authActions } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
+import Spinner from '../components/Spinner';
 
 function Register() {
 	const [formData, setFormData] = useState({
@@ -9,15 +13,36 @@ function Register() {
 		password2: '',
 	});
 
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+
+	const { data, isLoading, isError, isSuccess, message } = useSelector(
+		(state) => state.auth
+	);
+
+	useEffect(() => {
+		if (isError) {
+			console.log(message);
+		}
+		if (isSuccess && data) {
+			navigate('/');
+		}
+	}, [data, isError, isSuccess, message, navigate, dispatch]);
+
 	const { name, email, password, password2 } = formData;
 
 	const onSubmit = (e) => {
 		e.preventDefault();
-		if (password !== password2) {
-			console.log('passwords do not match');
+		if (name.trim() === '' || email.trim() === '') {
+			console.log('please Enter Creds');
 			return;
 		}
-		console.log(formData);
+		if (password === '' || password !== password2) {
+			console.log('passwords do not match');
+			dispatch(authActions.reset());
+			return;
+		}
+		dispatch(register({ name, email, password }));
 	};
 
 	const onChange = (e) => {
@@ -27,6 +52,7 @@ function Register() {
 		}));
 	};
 
+	if (isLoading) return <Spinner />;
 	return (
 		<>
 			<section className='heading'>
