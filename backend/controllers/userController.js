@@ -33,10 +33,11 @@ const registerUser = asyncHandler(async (req, res) => {
 	});
 
 	if (newUser) {
-		res.status(200).header('token', generateJWT(newUser._id)).json({
+		res.status(200).json({
 			_id: newUser._id,
 			name: newUser.name,
 			email: newUser.email,
+			token: generateJWT(newUser._id),
 		});
 	} else {
 		res.status(400);
@@ -60,11 +61,11 @@ const userLogin = asyncHandler(async (req, res) => {
 	//user found, check password
 	const decryptPass = await bcryptjs.compare(password, user.password);
 	if (decryptPass) {
-		res.header('token', generateJWT(user._id));
 		res.status(200).json({
 			_id: user._id,
 			name: user.name,
 			email: user.email,
+			token: generateJWT(user._id),
 		});
 	} else {
 		res.status(400);
